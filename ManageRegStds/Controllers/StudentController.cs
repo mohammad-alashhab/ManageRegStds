@@ -46,16 +46,15 @@ namespace ManageRegStds.Controllers
 
                 if (students.Count == 0)
                 {
-                    ViewBag.NotFound = true;
+                    return Json(new { NotFound = true });
                 }
 
-                ViewBag.SearchResults = students; // Pass the results to the view
-
-                return View();
+                return Json(students);
             }
 
-            return View();
+            return Json(new { ValidationError = true });
         }
+
 
 
 

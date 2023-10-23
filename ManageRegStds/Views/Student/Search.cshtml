@@ -9,7 +9,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Search">
+        <form asp-action="Search" id="search-form">
             <div class="form-group">
                 <label asp-for="FullName" class="control-label">Name:</label>
                 <input asp-for="FullName" class="form-control" />
@@ -28,45 +28,62 @@
                 <span asp-validation-for="GradeName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Search" class="btn btn-primary" style="margin-top:10px" />
+                <input type="submit" value="Search" class="btn btn-primary" style="margin-top: 10px" />
             </div>
         </form>
     </div>
 </div>
 
-@if (ViewBag.SearchResults != null && ViewBag.NotFound != true)
-{
-    <h2 class="mt-5">Search Results</h2>
-    <table class="table" style="width: 100%; border-collapse: collapse;">
-        <thead>
-            <tr style="background-color: #007BFF; color: #fff;">
-                <th style="padding: 10px;">Full Name</th>
-                <th style="padding: 10px;">Student Number</th>
-                <th style="padding: 10px;">Grade Name</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var student in ViewBag.SearchResults)
-            {
-                <tr>
-                    <td style="padding: 10px; border: 1px solid #ccc;">@student.FullName</td>
-                    <td style="padding: 10px; border: 1px solid #ccc;">@student.StudentNumber</td>
-                    <td style="padding: 10px; border: 1px solid #ccc;">@student.GradeName</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else if (ViewBag.NotFound != null && ViewBag.NotFound == true)
-{
-    <h3 class="text-danger mt-5">NOT FOUND</h3>
-}
-
+<div id="searchResults"></div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-}
-@* commit *@
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#search-form").submit(function (event) {
+                event.preventDefault();
 
+                var formData = $(this).serialize();
+
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Search", "Student")",
+                    data: formData,
+                    success: function (data) {
+                        console.log(data);
+                        if (data.notFound) {
+                            $("#searchResults").html('<h3 class="text-danger mt-5">NOT FOUND</h3>');
+                        } else if (data.length > 0) {
+                            displaySearchResults(data);
+                        }
+                    },
+                    error: function () {
+                        alert("Failed to search for students.");
+                    }
+                });
+            });
+
+            function displaySearchResults(results) {
+                $("#searchResults").html('<h2 class="mt-5">Search Results</h2>');
+                var table = $('<table class="table" style="width: 100%; border-collapse: collapse;">');
+                var thead = $('<thead><tr style="background-color: #007BFF; color: #fff;"><th style="padding: 10px;">Full Name</th><th style="padding: 10px;">Student Number</th><th style="padding: 10px;">Grade Name</th></tr></thead>');
+                var tbody = $("<tbody>");
+
+                $.each(results, function (index, student) {
+                    var row = $("<tr>");
+                    row.append('<td style="padding: 10px; border: 1px solid #ccc;">' + student.fullName + '</td>');
+                    row.append('<td style="padding: 10px; border: 1px solid #ccc;">' + student.studentNumber + '</td>');
+                    row.append('<td style="padding: 10px; border: 1px solid #ccc;">' + student.gradeName + '</td>');
+                    tbody.append(row);
+                });
+
+                table.append(thead);
+                table.append(tbody);
+                $("#searchResults").append(table);
+            }
+        });
+    </script>
+}

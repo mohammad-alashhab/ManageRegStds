@@ -28,6 +28,7 @@ namespace ManageRegStds.Controllers
             return View();
         }
 
+        [HttpPost]
         public JsonResult GetTimeJson()
         {
             var currentTime = DateTime.Now;

@@ -17,7 +17,7 @@
             $("#getTimeBtn").click(function () {
                 $.ajax({
                     url: "/Home/GetTimeJson",
-                    type: "GET",
+                    type: "POST",
                     success: function (data) {
                         $("#timeResult").html("Current Time: " + data.time);
                     },

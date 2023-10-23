@@ -1,6 +1,7 @@
 ﻿using ManageRegStds.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System;
 
 namespace ManageRegStds.Controllers
 {
@@ -22,6 +23,17 @@ namespace ManageRegStds.Controllers
         {
             return View();
         }
+        public IActionResult GetTime()
+        {
+            return View();
+        }
+
+        public JsonResult GetTimeJson()
+        {
+            var currentTime = DateTime.Now;
+            return Json(new { time = currentTime.ToString("HH:mm:ss") });
+        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
